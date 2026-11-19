@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract project ZIP
+      - name: Extract Project
         run: |
           mkdir -p project
           unzip -q ANEM_PLUS_Source.zip -d project
@@ -25,13 +25,10 @@ jobs:
       - name: Find Gradle Wrapper
         run: |
           WRAPPER=$(find project -type f -name gradlew | head -n 1)
-
           if [ -z "$WRAPPER" ]; then
-            echo "ERROR: gradlew not found!"
-            find project -maxdepth 4 -type f | head -100
+            echo "gradlew not found"
             exit 1
           fi
-
           echo "WRAPPER_DIR=$(dirname "$WRAPPER")" >> "$GITHUB_ENV"
 
       - name: Build APK
@@ -45,4 +42,11 @@ jobs:
         with:
           name: ANEM-PLUS-APK
           path: project/**/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Upload Full Project
+        uses: actions/upload-artifact@v4
+        with:
+          name: ANEM-PLUS-PROJECT
+          path: project/
           if-no-files-found: error
